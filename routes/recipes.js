@@ -1,3 +1,4 @@
+
 const Fawn = require("fawn")
 const express = require("express")
 const router = express.Router()
@@ -7,6 +8,7 @@ const {Category} = require("../models/categories")
 const _ = require("lodash")
 const mongoose = require("mongoose")
 const upload = require("../services/imageUpload")
+const auth = require("../middleware/auth")
 
 Fawn.init(mongoose)
 
@@ -22,7 +24,7 @@ router.get("/:id", async (req, res) => {
     return res.send(recipe)
 })
 
-router.post("/", upload.single("recipeImage"),  async (req, res) => {
+router.post("/", auth, upload.single("recipeImage"),  async (req, res) => {
     console.log(req.body)
     
     const {error} = validateRecipe(req.body)
@@ -64,14 +66,14 @@ router.post("/", upload.single("recipeImage"),  async (req, res) => {
     res.send(recipe)
 })
 
-router.delete("/:id", async (req, res) => {
+router.delete("/:id", auth, async (req, res) => {
     const recipe = await Recipe.findByIdAndRemove(req.params.id)
     if(!recipe) return res.status(400).send(`No Recipe with id ${req.params.id} found!`)
 
     res.send(recipe)
 })
 
-router.put("/:id", upload.single("recipeImage"), async (req, res) => {
+router.put("/:id", auth, upload.single("recipeImage"), async (req, res) => {
     const {error} = validateRecipe(req.body)
     if(error) return res.status(400).send(error.details[0].message)
 
