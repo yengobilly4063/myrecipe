@@ -1,4 +1,5 @@
 
+const auth = require("../middleware/auth")
 const express = require("express")
 const router = express.Router()
 const {User, validateUser} = require("../models/users")
@@ -21,6 +22,11 @@ router.post("/", async (req, res) => {
     const token = user.generateAuthToken()
 
     res.header("x-auth-token", token).send(_.pick(user, ["_id", "name", "email"]))
+})
+
+router.get("/me", auth,  async (req, res) =>{
+    const user = await User.findById(req.user._id).select("-password")
+    res.send(user)
 })
 
 
