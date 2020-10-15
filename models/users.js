@@ -30,7 +30,7 @@ const userSchema = new mongoose.Schema({
 })
 
 userSchema.methods.generateAuthToken = function(){
-    const token = jwt.sign({_id: this._id, email: this.email, password: this.password}, config.get("jwtPrivateKey")) 
+    const token = jwt.sign({_id: this._id, email: this.email, password: this.password, isAdmin: this.isAdmin}, config.get("jwtPrivateKey")) 
     return token
 }
 
@@ -43,6 +43,7 @@ validateUser = (user) => {
         name: Joi.string().required().min(5).max(255),
         email: Joi.string().required().email().min(5).max(255),
         password: Joi.string().required().min(8).max(255),
+        isAdmin: Joi.string().default(false)
     }
 
     return Joi.validate(user, userSchema);

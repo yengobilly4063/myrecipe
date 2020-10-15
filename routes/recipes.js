@@ -9,6 +9,7 @@ const _ = require("lodash")
 const mongoose = require("mongoose")
 const upload = require("../services/imageUpload")
 const auth = require("../middleware/auth")
+const admin = require("../middleware/admin")
 
 Fawn.init(mongoose)
 
@@ -66,14 +67,14 @@ router.post("/", auth, upload.single("recipeImage"),  async (req, res) => {
     res.send(recipe)
 })
 
-router.delete("/:id", auth, async (req, res) => {
+router.delete("/:id", [auth, admin], async (req, res) => {
     const recipe = await Recipe.findByIdAndRemove(req.params.id)
     if(!recipe) return res.status(400).send(`No Recipe with id ${req.params.id} found!`)
 
     res.send(recipe)
 })
 
-router.put("/:id", auth, upload.single("recipeImage"), async (req, res) => {
+router.put("/:id", [auth, admin], upload.single("recipeImage"), async (req, res) => {
     const {error} = validateRecipe(req.body)
     if(error) return res.status(400).send(error.details[0].message)
 
